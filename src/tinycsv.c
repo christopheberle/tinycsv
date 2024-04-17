@@ -82,5 +82,5 @@ char** csv_read_line(CsvParser* parser) {
         }
         q++;
     }
-    return line_contents;// parser->lineptr;
+    return line_contents;
 }
