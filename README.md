@@ -9,6 +9,7 @@ tinycsv is a minimal library for reading .csv / .tsv files in C.
 To get started open up a CSV file using `CsvParser* csv_open_file(const char* filename, char delimiter)` as follows
 
 ```C
+#include <stdio.h>
 #include "tinycsv.h"
 
 int main() {
