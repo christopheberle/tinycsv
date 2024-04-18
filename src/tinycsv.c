@@ -51,10 +51,11 @@ char** csvreadl(CSVFILE* file) {
     if (feof(file->fptr)) { errno = EOF; return NULL; } // reached end of document
 
     ssize_t read = getline(&(file->lineptr), &(file->linesize), file->fptr);
-    if (read == -1) { errno = EIO; return NULL; }
+    if (read == -1) { errno = EIO; return NULL; } // getline() failed
 
-    char** line_contents = malloc((file->num_cols) * sizeof(char*)); // malloc() failed
-    if (!line_contents) { errno = ENOMEM; return NULL; } // getline() failed
+    char** line_contents = malloc((file->num_cols + 1) * sizeof(char*));
+    if (!line_contents) { errno = ENOMEM; return NULL; } // malloc() failed
+    line_contents[file->num_cols] = NULL; // NULL terminate double pointer
 
     size_t fidx = 0;
     char* p = file->lineptr;
@@ -82,4 +83,11 @@ char** csvreadl(CSVFILE* file) {
         q++;
     }
     return line_contents;
+}
+
+void csvfreel(char** line) {
+    for (char** ptr = line; *ptr; ptr++) {
+        free(*ptr);
+    }
+    free(line);
 }

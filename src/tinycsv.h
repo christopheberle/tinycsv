@@ -19,4 +19,6 @@ void csvclose(CSVFILE* file);
 
 char** csvreadl(CSVFILE* file);
 
+void csvfreel(char** line);
+
 #endif // TINYCSV_H

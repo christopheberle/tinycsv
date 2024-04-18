@@ -31,7 +31,9 @@ typedef struct {
 
 Note that `csvopen` initialises this struct for you so there is no need to set any of these fields. If initialisation fails a `NULL` pointer is returned and `errno` is set accordingly.
 
-Next, to actually read a CSV file, tinycsv exposes a `char** csvreadl(CSVFILE* file)` function which reads the current line in the file, returning a `char` double pointer which can be indexed from `0` to `file->num_cols` yielding the `n`-th column value of the current row. 
+Next, to actually read a CSV file, tinycsv exposes a `char** csvreadl(CSVFILE* file)` function which reads the current line in the file, returning a `char` double pointer which can be indexed from `0` to `file->num_cols` yielding the `n`-th column value of the current row. Note that the double pointer is `NULL` terminated.
+
+To free the double pointer returned by `char** csvreadl(CSVFILE* file)` tinycsv provides a convenience function `void csvfreel(char** line)`. (*Only use this function on NULL terminated double pointers*!)
 
 For example, to print the first two lines of the CSV file we opened above we can do
 
@@ -44,6 +46,7 @@ for (size_t i = 0; i < nrows; i++) {
     for (size_t j = 0; j < file->num_cols; j++) {
         printf("%s\t", line_contents[j]);
     }
+    csvfreel(line_contents);
     printf("\n");
 }
 ...

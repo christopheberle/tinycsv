@@ -24,9 +24,8 @@ int main(int argc, char* argv[]) {
         if (errno != 0) { perror("Error"); exit(EXIT_FAILURE); } // csvreadl() failed
         for (size_t j = 0; j < file->num_cols; j++) {
             printf("%s ", line[j]);
-            free(line[j]);
         }
-        free(line);
+        csvfreel(line);
         printf("\n");
     }
     csvclose(file);
