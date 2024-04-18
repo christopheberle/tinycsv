@@ -14,21 +14,21 @@ int main(int argc, char* argv[]) {
     char* filename = argv[1];
 
     printf("Attempting to read file %s\n", filename);
-    CsvParser* parser = csv_open_file(filename, ';');
-    if (parser == NULL) { perror("Error"); return EXIT_FAILURE; } // csv_open_file() failed
+    CSVFILE* file = csvopen(filename, ';');
+    if (file == NULL) { perror("Error"); return EXIT_FAILURE; } // csvopen() failed
 
-    printf("Found %zu columns\n", parser->num_cols);
+    printf("Found %zu columns\n", file->num_cols);
     size_t nrows = 2; // number of rows to read
     for (size_t i = 0; i < nrows; i++) {
-        char **line = csv_read_line(parser);
-        if (errno != 0) { perror("Error"); exit(EXIT_FAILURE); } // csv_read_line() failed
-        for (size_t j = 0; j < parser->num_cols; j++) {
+        char **line = csvreadl(file);
+        if (errno != 0) { perror("Error"); exit(EXIT_FAILURE); } // csvreadl() failed
+        for (size_t j = 0; j < file->num_cols; j++) {
             printf("%s ", line[j]);
             free(line[j]);
         }
-        printf("\n");
         free(line);
+        printf("\n");
     }
-    csv_free_parser(parser);
+    csvclose(file);
     return EXIT_SUCCESS;
 }

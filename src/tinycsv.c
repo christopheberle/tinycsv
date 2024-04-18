@@ -15,8 +15,8 @@ static size_t csv_colcount(char* line, char delim) {
     return colcount;
 }
 
-CsvParser* csv_open_file(const char* filename, char delim) {
-    CsvParser* reader = malloc(sizeof(CsvParser));
+CSVFILE* csvopen(const char* filename, char delim) {
+    CSVFILE* reader = malloc(sizeof(CSVFILE));
     if (!reader) { free(reader); errno = ENOMEM; return NULL; } // malloc() failed
 
     FILE* fptr = fopen(filename, "r");
@@ -41,28 +41,27 @@ CsvParser* csv_open_file(const char* filename, char delim) {
     return reader;
 }
 
-void csv_free_parser(CsvParser* parser) {
-    fclose(parser->fptr);
-    free(parser->lineptr);
-    free(parser);
+void csvclose(CSVFILE* file) {
+    fclose(file->fptr);
+    free(file->lineptr);
+    free(file);
 }
 
+char** csvreadl(CSVFILE* file) {
+    if (feof(file->fptr)) { errno = EOF; return NULL; } // reached end of document
 
-char** csv_read_line(CsvParser* parser) {
-    if (feof(parser->fptr)) { errno = EOF; return NULL; } // reached end of document
-
-    ssize_t read = getline(&(parser->lineptr), &(parser->linesize), parser->fptr);
+    ssize_t read = getline(&(file->lineptr), &(file->linesize), file->fptr);
     if (read == -1) { errno = EIO; return NULL; }
 
-    char** line_contents = malloc(parser->num_cols * sizeof(char*)); // malloc() failed
+    char** line_contents = malloc((file->num_cols) * sizeof(char*)); // malloc() failed
     if (!line_contents) { errno = ENOMEM; return NULL; } // getline() failed
 
     size_t fidx = 0;
-    char* p = parser->lineptr;
-    char* q = parser->lineptr;
+    char* p = file->lineptr;
+    char* q = file->lineptr;
     
     while (*q != '\0') {
-        if (*q == parser->delimiter || *q == '\n') {
+        if (*q == file->delimiter || *q == '\n') {
             char* content = malloc((q - p + 1) * sizeof(char)); // +1 for '\0' terminator
             if (!content) {
                 errno = ENOMEM;
